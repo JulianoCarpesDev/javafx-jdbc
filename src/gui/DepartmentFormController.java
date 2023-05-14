@@ -3,16 +3,22 @@ package gui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import db.DbException;
+import gui.util.Alerts;
 import gui.util.Constraints;
+import gui.util.Util;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import model.entities.Department;
+import model.services.DepartmentService;
 
-public class DepartmentFormController  implements Initializable{
-	
+public class DepartmentFormController implements Initializable {
+
 	private Department entity;
 	@FXML
 	private TextField txtId;
@@ -24,33 +30,68 @@ public class DepartmentFormController  implements Initializable{
 	private Button btnSave;
 	@FXML
 	private Button btnCancel;
+
+	private DepartmentService service;
 	
+
 	public void setDepartment(Department entity) {
 		this.entity = entity;
 	}
+
+	public void setDepartmentService(DepartmentService service) {
+		this.service = service;
+	}
+
+	@FXML
+	public void onbtSaveAction(ActionEvent event) {
+		if(entity == null) {
+			throw new IllegalStateException("Entity was null");
+		}
+		if(service == null) {
+			throw new IllegalStateException("Service was null");
+		}
+		try {
+			entity = getFormData();
+			service.saveOrUpdate(entity);
+			Util.currenstage(event).close();
+			
+		} catch (DbException e) {
+			Alerts.showAlerts("Error Saving", null, e.getMessage(), AlertType.ERROR);
+		}
+		
+		
 	
-	@FXML
-	public void onbtSaveAction() {
-		System.out.println("Save");
-		
 	}
-	@FXML
-	public void onbtCancelAction() {
-		System.out.println("Cancel");
+
+	private Department getFormData() {
+		Department obj = new Department();
 		
+		obj.setId(Util.tryParseToInt(txtId.getText()));
+		obj.setName(txtName.getText());
+		
+		return obj;
 	}
+
+	@FXML
+	public void onbtCancelAction(ActionEvent event) {
+		Util.currenstage(event).close();
+
+	}
+
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-	initializacaoNodes();
-		
+		initializacaoNodes();
+
 	}
+
 	private void initializacaoNodes() {
 		Constraints.setTextFieldInteger(txtId);
-		Constraints.setTextFieldMaxLength(txtId, 30);
+		Constraints.setTextFieldMaxLength(txtName, 20);
 	}
+
 	public void updateFormData() {
-		if(entity == null) {
-			throw new  IllegalStateException("Entity was null");
+		if (entity == null) {
+			throw new IllegalStateException("Entity was null");
 		}
 		txtId.setText(String.valueOf(entity.getId()));
 		txtName.setText(entity.getName());
