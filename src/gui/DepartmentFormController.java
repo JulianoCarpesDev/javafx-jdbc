@@ -36,6 +36,7 @@ public class DepartmentFormController implements Initializable {
 	private Button btnSave;
 	@FXML
 	private Button btnCancel;
+	
 
 	private DepartmentService service;
 	
@@ -112,12 +113,14 @@ public class DepartmentFormController implements Initializable {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		initializacaoNodes();
+		
 
 	}
 
 	private void initializacaoNodes() {
 		Constraints.setTextFieldInteger(txtId);
 		Constraints.setTextFieldMaxLength(txtName, 20);
+		btnSave.setStyle("-fx-text-fill: black; -fx-background-color: lightblue;");
 	}
 
 	public void updateFormData() {
